@@ -46,3 +46,9 @@ jwt:
   secret: ${JWT_SECRET_KEY:ajscqSVPNj4GNzF+Ln2H6yaE2etWGExa618+TDP96ZE=}
   access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:300000} # 300000
   refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+
+minio:
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${USERNAME_MINIO:minio}
+  secret-key: ${PASSWORD_MINIO:minio123}
+  bucket-name: ${BUCKET_NAME:bucket-name-images}

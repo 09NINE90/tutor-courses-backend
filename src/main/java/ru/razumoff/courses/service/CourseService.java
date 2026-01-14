@@ -3,6 +3,7 @@ package ru.razumoff.courses.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.razumoff.commonlib.exceptions.ErrorCode;
 import ru.razumoff.commonlib.exceptions.PlatformException;
 import ru.razumoff.config.security.JwtUserPrincipal;
@@ -10,6 +11,7 @@ import ru.razumoff.courses.dao.dto.CourseRsDto;
 import ru.razumoff.courses.dao.dto.CreateCourseRqDto;
 import ru.razumoff.courses.dao.entity.CourseEntity;
 import ru.razumoff.courses.dao.repository.CourseRepository;
+import ru.razumoff.minio.IMinioFileService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class CourseService implements ICourseService {
 
     private final CourseRepository repository;
+    private final IMinioFileService minioService;
 
     @Override
     public List<CourseRsDto> getAllCoursesByUser(JwtUserPrincipal principal) {
@@ -47,14 +50,19 @@ public class CourseService implements ICourseService {
 
     @Override
     public void createCourse(JwtUserPrincipal principal,
-                             CreateCourseRqDto request) {
+                             CreateCourseRqDto request, MultipartFile image) {
         UUID userId = principal.getId();
+
+        String imageUrl = null;
+        if (image != null && !image.isEmpty()){
+            imageUrl = minioService.uploadCourseImage(image);
+        }
 
         CourseEntity entity = new CourseEntity();
         entity.setId(UUID.randomUUID());
         entity.setTitle(request.getTitle());
         entity.setDescription(request.getDescription());
-        entity.setImageUrl(request.getImageUrl());
+        entity.setImageUrl(imageUrl);
         entity.setOwnerId(userId);
 
         repository.save(entity);

@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.razumoff.config.security.JwtUserPrincipal;
 import ru.razumoff.courses.dao.dto.CourseRsDto;
 import ru.razumoff.courses.dao.dto.CreateCourseRqDto;
 import ru.razumoff.courses.service.ICourseService;
-import ru.razumoff.integretion.IUserIntegrationService;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,9 +23,8 @@ import static ru.razumoff.Constants.ApiDocs.COURSES_TAG_NAME;
 @RequiredArgsConstructor
 @RequestMapping("/api/courses")
 @Tag(name = COURSES_TAG_NAME, description = COURSES_TAG_DESCRIPTION)
-public class CoursesController {
+public class CoursesApi {
 
-    private final IUserIntegrationService authClient;
     private final ICourseService service;
 
     @GetMapping("/dashboard")
@@ -37,8 +36,17 @@ public class CoursesController {
     @PostMapping("/create")
     @Operation(summary = "Создать курс")
     public ResponseEntity<Void> createCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
-                                             @RequestBody CreateCourseRqDto request) {
-        service.createCourse(principal, request);
+                                             @RequestPart("title") String title,
+                                             @RequestPart("description") String description,
+                                             @RequestPart(value = "image", required = false) MultipartFile image) {
+        service.createCourse(
+                principal,
+                CreateCourseRqDto.builder()
+                        .title(title)
+                        .description(description)
+                        .build(),
+                image
+        );
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -49,10 +57,4 @@ public class CoursesController {
         return ResponseEntity.ok(service.getCourseById(principal, courseId));
     }
 
-    //    @GetMapping("/profile")
-//    @PreAuthorize("#principal.requireRole('ADMIN')")
-//    public ResponseEntity<ProfileRsDto> profile(@AuthenticationPrincipal JwtUserPrincipal principal) {
-//        ProfileRsDto profileUser = authClient.getUserProfile(principal.getId());
-//        return ResponseEntity.ok(profileUser);
-//    }
 }

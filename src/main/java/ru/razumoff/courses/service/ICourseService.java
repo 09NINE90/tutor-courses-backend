@@ -1,5 +1,6 @@
 package ru.razumoff.courses.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import ru.razumoff.config.security.JwtUserPrincipal;
 import ru.razumoff.courses.dao.dto.CourseRsDto;
 import ru.razumoff.courses.dao.dto.CreateCourseRqDto;
@@ -10,7 +11,7 @@ import java.util.UUID;
 public interface ICourseService {
     List<CourseRsDto> getAllCoursesByUser(JwtUserPrincipal principal);
 
-    void createCourse(JwtUserPrincipal principal, CreateCourseRqDto request);
+    void createCourse(JwtUserPrincipal principal, CreateCourseRqDto request, MultipartFile image);
 
     CourseRsDto getCourseById(JwtUserPrincipal principal, UUID courseId);
 }
