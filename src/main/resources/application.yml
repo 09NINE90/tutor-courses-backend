@@ -5,6 +5,11 @@ spring:
   application:
     name: Цифровой портал для репетиторов (сервис для работы с курсами)
     version: 1.0
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      enabled: true
   datasource:
     url: ${URL_DB}
     username: ${USERNAME_DB}
