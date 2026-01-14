@@ -28,7 +28,7 @@ public class CoursesController {
     private final IUserIntegrationService authClient;
     private final ICourseService service;
 
-    @GetMapping
+    @GetMapping("/dashboard")
     @Operation(summary = "Получить список курсов пользователя")
     public ResponseEntity<List<CourseRsDto>> getAllCourses(@AuthenticationPrincipal JwtUserPrincipal principal) {
         return ResponseEntity.ok(service.getAllCoursesByUser(principal));
