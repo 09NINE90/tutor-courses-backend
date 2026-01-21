@@ -2,6 +2,8 @@ package ru.razumoff.exeptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.razumoff.commonlib.dto.ApiError;
@@ -9,6 +11,9 @@ import ru.razumoff.commonlib.exceptions.ErrorCode;
 import ru.razumoff.commonlib.exceptions.PlatformException;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,6 +35,29 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(code.getHttpStatus()).body(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex) {
+        ApiError error = new ApiError(
+                Instant.now(),
+                400,
+                ErrorCode.VALIDATION_ERROR.getCode(),
+                ErrorCode.VALIDATION_ERROR.getDefaultMessage(),
+                null
+        );
+
+        Map<String, List<String>> fieldErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        FieldError::getField,
+                        Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                ));
+
+        error.setFieldErrors(fieldErrors);
+
+        return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(Exception.class)
