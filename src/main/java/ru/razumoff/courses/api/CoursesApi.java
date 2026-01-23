@@ -11,9 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.razumoff.config.security.JwtUserPrincipal;
 import ru.razumoff.courses.dao.dto.CourseRsDto;
 import ru.razumoff.courses.dao.dto.CreateCourseRqDto;
+import ru.razumoff.courses.dao.dto.DashboardResponse;
 import ru.razumoff.courses.service.ICourseService;
 
-import java.util.List;
 import java.util.UUID;
 
 import static ru.razumoff.Constants.ApiDocs.COURSES_TAG_DESCRIPTION;
@@ -29,8 +29,8 @@ public class CoursesApi {
 
     @GetMapping("/dashboard")
     @Operation(summary = "Получить список курсов пользователя")
-    public ResponseEntity<List<CourseRsDto>> getAllCourses(@AuthenticationPrincipal JwtUserPrincipal principal) {
-        return ResponseEntity.ok(service.getAllCoursesByUser(principal));
+    public ResponseEntity<DashboardResponse> getAllCourses(@AuthenticationPrincipal JwtUserPrincipal principal) {
+        return ResponseEntity.ok(service.getCoursesDashboard(principal));
     }
 
     @PostMapping("/create")

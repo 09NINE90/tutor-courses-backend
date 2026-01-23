@@ -9,6 +9,7 @@ import ru.razumoff.commonlib.exceptions.PlatformException;
 import ru.razumoff.config.security.JwtUserPrincipal;
 import ru.razumoff.courses.dao.dto.CourseRsDto;
 import ru.razumoff.courses.dao.dto.CreateCourseRqDto;
+import ru.razumoff.courses.dao.dto.DashboardResponse;
 import ru.razumoff.courses.dao.entity.CourseEntity;
 import ru.razumoff.courses.dao.repository.CourseRepository;
 import ru.razumoff.minio.IMinioFileService;
@@ -27,25 +28,37 @@ public class CourseService implements ICourseService {
     private final IMinioFileService minioService;
 
     @Override
-    public List<CourseRsDto> getAllCoursesByUser(JwtUserPrincipal principal) {
-        UUID userId = principal.getId();
+    public DashboardResponse getCoursesDashboard(JwtUserPrincipal principal) {
+        if (principal.hasRole("TUTOR")) {
+            return getAllCoursesByOwner(principal.getId());
+        } else if (principal.hasRole("STUDENT")) {
+            return new DashboardResponse(false, Collections.emptyList());
+        } else {
+            throw new PlatformException(ErrorCode.AUTH_ACCESS_DENIED);
+        }
+    }
+
+    private DashboardResponse getAllCoursesByOwner(UUID userId) {
         List<CourseEntity> entities = repository.findAllByOwnerIdOrderByCreatedAtDesc(userId);
 
-        if (entities.isEmpty()) return Collections.emptyList();
-
         List<CourseRsDto> result = new ArrayList<>();
-        for (CourseEntity entity : entities) {
-            result.add(
-                    CourseRsDto.builder()
-                            .id(entity.getId())
-                            .title(entity.getTitle())
-                            .description(entity.getDescription())
-                            .imageUrl(entity.getImageUrl())
-                            .build()
-            );
+        if (!entities.isEmpty()) {
+            for (CourseEntity entity : entities) {
+                result.add(
+                        CourseRsDto.builder()
+                                .id(entity.getId())
+                                .title(entity.getTitle())
+                                .description(entity.getDescription())
+                                .imageUrl(entity.getImageUrl())
+                                .build()
+                );
+            }
         }
 
-        return result;
+        return DashboardResponse.builder()
+                .isTutor(true)
+                .courses(result)
+                .build();
     }
 
     @Override
@@ -54,7 +67,7 @@ public class CourseService implements ICourseService {
         UUID userId = principal.getId();
 
         String imageUrl = null;
-        if (image != null && !image.isEmpty()){
+        if (image != null && !image.isEmpty()) {
             imageUrl = minioService.uploadCourseImage(image);
         }
 
