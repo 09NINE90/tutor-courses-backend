@@ -44,8 +44,9 @@ springdoc:
 
 integration:
   user:
-    host: http://localhost:8081/api/user
-    user-profile-api: /profile
+#    host: http://localhost:8081
+    host: ${USER_SERVICE_HOST:http://auth-service:8081}
+    get-user-profiles: /api/user/profiles
 
 jwt:
   secret: ${JWT_SECRET_KEY:ajscqSVPNj4GNzF+Ln2H6yaE2etWGExa618+TDP96ZE=}

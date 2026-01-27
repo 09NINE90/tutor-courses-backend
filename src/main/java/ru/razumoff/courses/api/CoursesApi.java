@@ -9,11 +9,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.razumoff.config.security.JwtUserPrincipal;
+import ru.razumoff.courses.dao.dto.CourseMemberRsDto;
 import ru.razumoff.courses.dao.dto.CourseRsDto;
 import ru.razumoff.courses.dao.dto.CreateCourseRqDto;
 import ru.razumoff.courses.dao.dto.DashboardResponse;
 import ru.razumoff.courses.service.ICourseService;
 
+import java.util.List;
 import java.util.UUID;
 
 import static ru.razumoff.Constants.ApiDocs.COURSES_TAG_DESCRIPTION;
@@ -55,6 +57,13 @@ public class CoursesApi {
     public ResponseEntity<CourseRsDto> getCourseById(@AuthenticationPrincipal JwtUserPrincipal principal,
                                                      @PathVariable("course_id") UUID courseId) {
         return ResponseEntity.ok(service.getCourseById(principal, courseId));
+    }
+
+    @GetMapping("/{course_id}/members")
+    @Operation(summary = "Получить участников курса по ID")
+    public ResponseEntity<List<CourseMemberRsDto>> getCourseMembersById(@AuthenticationPrincipal JwtUserPrincipal principal,
+                                                                       @PathVariable("course_id") UUID courseId) {
+        return ResponseEntity.ok(service.getCourseMembersById(principal, courseId));
     }
 
 }
