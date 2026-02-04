@@ -10,7 +10,8 @@ public enum EnrollmentStatus {
     ACTIVE("Активный"),
     SUSPENDED("Приостановлен"),
     BLOCKED("Заблокирован"),
-    DROPPED("Удалён");
+    DROPPED("Удалён"),
+    NO_ACCESS("Нет доступа");
 
     private final String label;
 

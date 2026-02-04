@@ -8,7 +8,9 @@ public class Constants {
     @UtilityClass
     public class ApiDocs {
         public static final String COURSES_TAG_NAME = "Курсы";
-        public static final String COURSES_TAG_DESCRIPTION = "Управление курсами (получение, создание, редактирование)";
+        public static final String COURSES_TAG_DESCRIPTION = "CRUD операции над курсами";
+        public static final String COURSE_TAG_NAME = "Курсы (Single)";
+        public static final String COURSE_TAG_DESCRIPTION = "CRUD операции над конкретным курсом";
     }
 
     @UtilityClass

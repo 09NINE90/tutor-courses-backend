@@ -1,0 +1,28 @@
+package ru.razumoff.courses.dao.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+@Schema(description = "Краткая информация о курсе с плагом роли")
+public class CoursePageRsDto {
+
+    @Schema(
+            description = "Флаг - учитель или нет",
+            example = "true"
+    )
+    @JsonProperty(value = "isTutor")
+    private boolean isTutor;
+
+    @Schema(
+            description = "Статус участника в курсе",
+            example = "INVITED"
+    )
+    private String status;
+
+    @Schema(implementation = CourseRsDto.class)
+    private CourseRsDto course;
+}

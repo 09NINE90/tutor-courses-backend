@@ -1,5 +1,7 @@
 package ru.razumoff.courses.dao.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,7 +15,7 @@ import java.util.UUID;
 public interface CourseRepository extends JpaRepository<CourseEntity, UUID> {
     List<CourseEntity> findAllByOwnerId(UUID ownerId);
 
-    List<CourseEntity> findAllByOwnerIdOrderByCreatedAtDesc(UUID ownerId);
+    Page<CourseEntity> findAllByOwnerIdOrderByCreatedAtDesc(UUID ownerId, Pageable pageable);
 
     Optional<CourseEntity> findByOwnerIdAndId(UUID ownerId, UUID courseId);
 

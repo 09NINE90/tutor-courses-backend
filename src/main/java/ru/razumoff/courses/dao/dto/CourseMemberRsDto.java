@@ -1,5 +1,6 @@
 package ru.razumoff.courses.dao.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,13 @@ public class CourseMemberRsDto {
             example = "123e4567-e89b-12d3-a456-426614174000"
     )
     private UUID userId;
+
+    @Schema(
+            description = "Флаг - профиль того, кто запросил или нет",
+            example = "false"
+    )
+    @JsonProperty(value = "isMe")
+    private boolean isMe;
 
     @Schema(
             description = "Email пользователя",

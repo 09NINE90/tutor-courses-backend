@@ -17,6 +17,9 @@ import java.io.IOException;
 @Component
 public class JwtRequestInterceptor implements ClientHttpRequestInterceptor {
 
+    /**
+     * Перехватчик: проброс JWT токена в SecurityContext для внешних сервисов
+     */
     @Override
     public @NonNull ClientHttpResponse intercept(@NonNull HttpRequest request, byte @NonNull [] body,
                                                  @NonNull ClientHttpRequestExecution execution) throws IOException {
