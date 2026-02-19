@@ -44,8 +44,9 @@ springdoc:
 
 integration:
   user:
-    host: http://localhost:8081
-#    host: ${USER_SERVICE_HOST:http://auth-service:8081}
+#    host: http://razum0ff.ru:8081
+#    host: http://localhost:8081
+    host: ${USER_SERVICE_HOST:http://razum0ff.ru:8081}
     get-user-profiles: /api/user/profiles
 
 jwt:
@@ -58,3 +59,6 @@ minio:
   access-key: ${USERNAME_MINIO:minio}
   secret-key: ${PASSWORD_MINIO:minio123}
   bucket-name: ${BUCKET_NAME:bucket-name-images}
+
+origins:
+  front: ${FRONT_ORIGIN:http://localhost:3000}

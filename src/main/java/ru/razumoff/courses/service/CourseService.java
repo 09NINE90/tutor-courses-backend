@@ -68,7 +68,7 @@ public class CourseService implements ICourseService {
                                 .id(entity.getId())
                                 .title(entity.getTitle())
                                 .description(entity.getDescription())
-                                .imageUrl(entity.getImageUrl())
+                                .imageUrl(minioService.generatePublicUrl(entity.getImageS3Key()))
                                 .build()
                 );
             }
@@ -95,7 +95,7 @@ public class CourseService implements ICourseService {
                         .id(enrollment.getCourse().getId())
                         .title(enrollment.getCourse().getTitle())
                         .description(enrollment.getCourse().getDescription())
-                        .imageUrl(enrollment.getCourse().getImageUrl())
+                        .imageUrl(minioService.generatePublicUrl(enrollment.getCourse().getImageS3Key()))
                         .build()
                 )
                 .toList();
@@ -118,16 +118,13 @@ public class CourseService implements ICourseService {
                              CreateCourseRqDto request, MultipartFile image) {
         UUID userId = principal.getId();
 
-        String imageUrl = null;
-        if (image != null && !image.isEmpty()) {
-            imageUrl = minioService.uploadCourseImage(image);
-        }
+        String s3Key = minioService.uploadCourseImage(image);
 
         CourseEntity entity = new CourseEntity();
         entity.setId(UUID.randomUUID());
         entity.setTitle(request.getTitle());
         entity.setDescription(request.getDescription());
-        entity.setImageUrl(imageUrl);
+        entity.setImageS3Key(s3Key);
         entity.setOwnerId(userId);
 
         repository.save(entity);
@@ -165,7 +162,7 @@ public class CourseService implements ICourseService {
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .description(entity.getDescription())
-                .imageUrl(entity.getImageUrl())
+                .imageUrl(minioService.generatePublicUrl(entity.getImageS3Key()))
                 .build();
 
         return CoursePageRsDto.builder()
@@ -207,7 +204,31 @@ public class CourseService implements ICourseService {
 
                     return dto;
                 })
+                .sorted((dto1, dto2) -> {
+                    int lastNameCompare = compareNullableStrings(dto1.getLastName(), dto2.getLastName());
+                    if (lastNameCompare != 0) {
+                        return lastNameCompare;
+                    }
+                    return compareNullableStrings(dto1.getFirstName(), dto2.getFirstName());
+                })
                 .toList();
+    }
+
+    /**
+     * Сравнение двух строк с учетом null значений
+     * null значения идут в конец
+     */
+    private int compareNullableStrings(String str1, String str2) {
+        if (str1 == null && str2 == null) {
+            return 0;
+        }
+        if (str1 == null) {
+            return 1;
+        }
+        if (str2 == null) {
+            return -1;
+        }
+        return str1.compareToIgnoreCase(str2);
     }
 
     /**

@@ -30,8 +30,11 @@ public class CourseEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    /**
+     * Ключ изображения курса
+     */
+    @Column(name = "image_s3_key")
+    private String imageS3Key;
 
     @Column(name = "owner_id", nullable = false)
     private UUID ownerId;
