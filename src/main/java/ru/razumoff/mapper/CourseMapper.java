@@ -1,9 +1,9 @@
 package ru.razumoff.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.razumoff.commonlib.dto.integration.ProfileRsDto;
 import ru.razumoff.courses.dao.dto.CourseMemberRsDto;
 import ru.razumoff.courses.dao.entity.CourseEnrollmentEntity;
+import ru.razumoff.dto.integration.ProfileRsDto;
 
 @Component
 public class CourseMapper {

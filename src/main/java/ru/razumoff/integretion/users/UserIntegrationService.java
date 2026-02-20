@@ -7,9 +7,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import ru.razumoff.commonlib.dto.integration.ProfileRsDto;
-import ru.razumoff.commonlib.exceptions.ErrorCode;
-import ru.razumoff.commonlib.exceptions.PlatformException;
+import ru.razumoff.dto.integration.ProfileRsDto;
+import ru.razumoff.exceptions.ErrorCode;
+import ru.razumoff.exceptions.PlatformException;
 
 import java.util.List;
 import java.util.UUID;

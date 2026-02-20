@@ -17,7 +17,7 @@ java {
 repositories {
     maven {
         name = 'MinIO'
-        url = 'http://razum0ff.ru:9000/maven-repository'
+        url = 'https://minio.razum0ff.ru/maven-repository'
         allowInsecureProtocol = true
     }
     mavenLocal()
