@@ -13,7 +13,7 @@ public class RestTemplateConfig {
     @Bean
     public RestTemplate restTemplate(List<ClientHttpRequestInterceptor> interceptors) {
         RestTemplate rt = new RestTemplate();
-        rt.setInterceptors(interceptors);
+//        rt.setInterceptors(interceptors);
         return rt;
     }
 
