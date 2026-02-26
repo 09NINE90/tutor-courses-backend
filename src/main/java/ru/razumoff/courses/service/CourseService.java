@@ -124,8 +124,8 @@ public class CourseService implements ICourseService {
 
         CourseEntity entity = new CourseEntity();
         entity.setId(UUID.randomUUID());
-        entity.setTitle(request.getTitle());
-        entity.setDescription(request.getDescription());
+        entity.setTitle(request.getTitle().trim());
+        entity.setDescription(request.getDescription().trim());
         entity.setImageS3Key(s3Key);
         entity.setOwnerId(userId);
 
