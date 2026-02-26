@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.razumoff.config.security.JwtUserPrincipal;
 import ru.razumoff.courses.dao.dto.*;
 import ru.razumoff.courses.dao.dto.internal.InviteUserDto;
 import ru.razumoff.courses.dao.entity.CourseEnrollmentEntity;
@@ -20,6 +19,7 @@ import ru.razumoff.dto.integration.ProfileRsDto;
 import ru.razumoff.exceptions.ErrorCode;
 import ru.razumoff.exceptions.PlatformException;
 import ru.razumoff.integretion.users.IUserIntegrationService;
+import ru.razumoff.jwt.JwtUserPrincipal;
 import ru.razumoff.mapper.CourseMapper;
 import ru.razumoff.minio.IMinioFileService;
 
@@ -45,17 +45,21 @@ public class CourseService implements ICourseService {
     public DashboardResponse getCoursesDashboard(JwtUserPrincipal principal, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        if (principal.hasRole("TUTOR")) {
-            return getAllCoursesByOwner(principal.getId(), pageable);
-        } else if (principal.hasRole("STUDENT")) {
-            return getStudentCourses(principal.getId(), pageable);
+        DashboardResponse response;
+        if (principal.hasAnyPermission("COURSE_READ_OWN")) {
+            response = getAllCoursesByOwner(principal.getId(), pageable);
+        } else if (principal.hasAnyPermission("COURSE_READ_ENROLLED")) {
+            response = getStudentCourses(principal.getId(), pageable);
         } else {
             throw new PlatformException(ErrorCode.AUTH_ACCESS_DENIED);
         }
+
+        response.setPermissions(principal.getPermissions());
+        return response;
     }
 
     /**
-     * Курсы владельца (TUTOR) с пагинацией
+     * Курсы владельца с пагинацией
      */
     private DashboardResponse getAllCoursesByOwner(UUID userId, Pageable pageable) {
         Page<CourseEntity> courses = repository.findAllByOwnerIdOrderByCreatedAtDesc(userId, pageable);
@@ -79,7 +83,6 @@ public class CourseService implements ICourseService {
                 .currentPage(pageable.getPageNumber())
                 .totalPages(courses.getTotalPages())
                 .totalElements(courses.getTotalElements())
-                .isTutor(true)
                 .courses(result)
                 .build();
     }
@@ -105,7 +108,6 @@ public class CourseService implements ICourseService {
                 .currentPage(pageable.getPageNumber())
                 .totalPages(enrollmentsPage.getTotalPages())
                 .totalElements(enrollmentsPage.getTotalElements())
-                .isTutor(false)
                 .courses(courses)
                 .build();
     }
@@ -138,13 +140,12 @@ public class CourseService implements ICourseService {
         UUID userId = principal.getId();
 
         CourseEntity entity;
-        boolean isTutor = principal.hasRole("TUTOR");
         String status = null;
-        if (principal.hasRole("TUTOR")) {
+        if (principal.hasAnyPermission("COURSE_READ_OWN")) {
             entity = repository.findByOwnerIdAndId(userId, courseId).orElseThrow(
                     () -> new PlatformException(ErrorCode.COURSE_NOT_FOUND)
             );
-        } else if (principal.hasRole("STUDENT")) {
+        } else if (principal.hasAnyPermission("COURSE_READ_ENROLLED")) {
             entity = repository.findById(courseId).orElseThrow(
                     () -> new PlatformException(ErrorCode.COURSE_NOT_FOUND)
             );
@@ -166,7 +167,7 @@ public class CourseService implements ICourseService {
                 .build();
 
         return CoursePageRsDto.builder()
-                .isTutor(isTutor)
+                .permissions(principal.getPermissions())
                 .status(status)
                 .course(course)
                 .build();
@@ -198,9 +199,7 @@ public class CourseService implements ICourseService {
                     ProfileRsDto profile = profileMap.get(enrollment.getUserId());
                     CourseMemberRsDto dto = courseMapper.toCourseMemberRsDto(enrollment, profile);
 
-                    if (!principal.hasRole("TUTOR")) {
-                        dto.setMe(enrollment.getUserId().equals(principal.getId()));
-                    }
+                    dto.setMe(enrollment.getUserId().equals(principal.getId()));
 
                     return dto;
                 })
@@ -257,7 +256,6 @@ public class CourseService implements ICourseService {
     @Override
     @Transactional
     public void confirmInvite(JwtUserPrincipal principal, UUID courseId) {
-        principal.requireRole("STUDENT");
 
         CourseEntity course = repository.findById(courseId).orElseThrow(
                 () -> new PlatformException(ErrorCode.COURSE_NOT_FOUND)

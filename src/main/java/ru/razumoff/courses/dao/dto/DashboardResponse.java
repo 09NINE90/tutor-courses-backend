@@ -1,7 +1,6 @@
 package ru.razumoff.courses.dao.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -10,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -18,12 +18,7 @@ import java.util.List;
 @Schema(description = "Дашборд курсов")
 public class DashboardResponse {
 
-    @Schema(
-            description = "Флаг - учитель или нет",
-            example = "true"
-    )
-    @JsonProperty(value = "isTutor")
-    private boolean isTutor;
+    Set<String> permissions;
 
     @Schema(
             description = "Общее количество страниц",

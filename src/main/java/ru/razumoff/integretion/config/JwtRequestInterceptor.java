@@ -9,7 +9,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import ru.razumoff.config.security.JwtUserPrincipal;
+import ru.razumoff.jwt.JwtUserPrincipal;
 
 import java.io.IOException;
 

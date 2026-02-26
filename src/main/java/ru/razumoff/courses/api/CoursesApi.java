@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.razumoff.config.security.JwtUserPrincipal;
 import ru.razumoff.courses.dao.dto.DashboardResponse;
 import ru.razumoff.courses.service.ICourseService;
+import ru.razumoff.jwt.JwtUserPrincipal;
 
 import static ru.razumoff.Constants.ApiDocs.COURSES_TAG_DESCRIPTION;
 import static ru.razumoff.Constants.ApiDocs.COURSES_TAG_NAME;
