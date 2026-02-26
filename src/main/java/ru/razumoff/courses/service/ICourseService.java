@@ -1,9 +1,9 @@
 package ru.razumoff.courses.service;
 
 import org.springframework.web.multipart.MultipartFile;
-import ru.razumoff.config.security.JwtUserPrincipal;
 import ru.razumoff.courses.dao.dto.*;
 import ru.razumoff.courses.dao.dto.internal.InviteUserDto;
+import ru.razumoff.jwt.JwtUserPrincipal;
 
 import java.util.List;
 import java.util.UUID;
