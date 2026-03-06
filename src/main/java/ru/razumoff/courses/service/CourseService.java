@@ -395,6 +395,11 @@ public class CourseService implements ICourseService {
         CourseEntity course = repository.findById(courseId)
                 .orElseThrow(() -> new PlatformException(ErrorCode.COURSE_NOT_FOUND));
 
+        if (course.getOwnerId().equals(studentId)) {
+            log.warn("Course owner {} tried to join own course {}", studentId, courseId);
+            throw new PlatformException(ErrorCode.COURSE_OWNER_CANT_JOIN);
+        }
+
         CourseInviteLinkEntity inviteLink = courseInviteLinkRepository
                 .findByTokenAndCourseId(request.getToken(), courseId)
                 .orElseThrow(() -> new PlatformException(ErrorCode.INVITE_LINK_INVALID));
