@@ -21,4 +21,10 @@ public interface ICourseService {
     void inviteUserToCourse(InviteUserDto request);
 
     void confirmInvite(JwtUserPrincipal principal, UUID courseId);
+
+    InviteLinkRsDto createInviteLink(JwtUserPrincipal principal, CreateInviteLinkRqDto request, UUID courseId);
+
+    InviteLinkRsDto getInviteLinks(JwtUserPrincipal principal, UUID courseId);
+
+    void joinWithInvite(UUID courseId, JoinCourseRqDto request, JwtUserPrincipal principal);
 }
