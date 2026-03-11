@@ -47,6 +47,9 @@ public class CourseEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    @Column(name = "last_view_at", nullable = false)
+    private OffsetDateTime lastViewAt;
+
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;

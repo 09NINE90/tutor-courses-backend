@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<CourseEntity, UUID> {
-    List<CourseEntity> findAllByOwnerId(UUID ownerId);
+    Page<CourseEntity> findAllByOwnerId(UUID ownerId, Pageable pageRequest);
 
     Page<CourseEntity> findAllByOwnerIdOrderByCreatedAtDesc(UUID ownerId, Pageable pageable);
 

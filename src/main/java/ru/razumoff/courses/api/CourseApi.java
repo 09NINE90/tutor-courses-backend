@@ -55,6 +55,14 @@ public class CourseApi {
         return ResponseEntity.ok(service.getCourseById(principal, courseId));
     }
 
+    @PutMapping("/{course_id}")
+    @Operation(summary = "Обновить дату просмотра курса")
+    public ResponseEntity<Void> viewCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
+                                           @PathVariable("course_id") UUID courseId) {
+        service.viewCourse(principal, courseId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
     @GetMapping("/{course_id}/members")
     @Operation(summary = "Получить участников курса по ID")
     public ResponseEntity<List<CourseMemberRsDto>> getCourseMembersById(@AuthenticationPrincipal JwtUserPrincipal principal,

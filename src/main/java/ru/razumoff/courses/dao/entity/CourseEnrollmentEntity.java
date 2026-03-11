@@ -35,6 +35,9 @@ public class CourseEnrollmentEntity {
     @Column(name = "enrolled_at")
     private OffsetDateTime enrolledAt;
 
+    @Column(name = "last_view_at", nullable = false)
+    private OffsetDateTime lastViewAt;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private EnrollmentStatus status;
