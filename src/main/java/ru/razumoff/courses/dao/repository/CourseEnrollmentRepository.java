@@ -22,8 +22,7 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
 
     @Query("SELECT e FROM CourseEnrollmentEntity e " +
             "JOIN FETCH e.course c " +
-            "WHERE e.userId = :studentId " +
-            "ORDER BY e.enrolledAt DESC")
+            "WHERE e.userId = :studentId")
     Page<CourseEnrollmentEntity> findAllByUserIdWithCourse(
             @Param("studentId") UUID studentId,
             Pageable pageable
