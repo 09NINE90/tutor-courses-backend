@@ -51,8 +51,9 @@ public class CourseService implements ICourseService {
      * Дашборд курсов: tutor=свои, student=активные
      */
     @Override
-    public DashboardResponse getCoursesDashboard(JwtUserPrincipal principal, int pageNumber, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+    public DashboardResponse getCoursesDashboard(JwtUserPrincipal principal, int pageNumber, int pageSize, String sortBy) {
+        Sort sort = getSortBy(sortBy);
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
 
         DashboardResponse response;
         if (principal.hasAnyPermission("COURSE_READ_OWN")) {
@@ -67,15 +68,19 @@ public class CourseService implements ICourseService {
         return response;
     }
 
+    private Sort getSortBy(String sortBy) {
+        if (sortBy.equals("lastViewDesc")) {
+            return Sort.by(Sort.Direction.DESC, "lastViewAt");
+        } else {
+            return Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+    }
+
     /**
      * Курсы владельца с пагинацией
      */
     private DashboardResponse getAllCoursesByOwner(UUID userId, PageRequest pageRequest) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "lastViewAt", "createdAt");
-        Page<CourseEntity> courses = repository.findAllByOwnerId(
-                userId,
-                pageRequest.withSort(sort)
-        );
+        Page<CourseEntity> courses = repository.findAllByOwnerId(userId, pageRequest);
 
         List<CourseRsDto> result = new ArrayList<>();
         if (!courses.isEmpty()) {
@@ -104,11 +109,7 @@ public class CourseService implements ICourseService {
      * Курсы студента по enrollment с пагинацией
      */
     private DashboardResponse getStudentCourses(UUID studentId, PageRequest pageRequest) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "lastViewAt", "enrolledAt");
-        Page<CourseEnrollmentEntity> enrollmentsPage = enrollmentRepository.findAllByUserIdWithCourse(
-                studentId,
-                pageRequest.withSort(sort)
-        );
+        Page<CourseEnrollmentEntity> enrollmentsPage = enrollmentRepository.findAllByUserIdWithCourse(studentId, pageRequest);
 
         List<CourseRsDto> courses = enrollmentsPage.getContent().stream()
                 .map(enrollment -> CourseRsDto.builder()
@@ -195,12 +196,12 @@ public class CourseService implements ICourseService {
      * Отмечает курс как просмотренный текущим пользователем.
      *
      * @param principal аутентифицированный пользователь с JWT токеном
-     * @param courseId идентификатор курса для отметки просмотра
+     * @param courseId  идентификатор курса для отметки просмотра
      * @throws PlatformException если:
-     * <ul>
-     *     <li>курс не найден ({@link ErrorCode#COURSE_NOT_FOUND})</li>
-     *     <li>запись о зачислении не найдена ({@link ErrorCode#ENROLLMENT_NOT_FOUND})</li>
-     * </ul>
+     *                           <ul>
+     *                               <li>курс не найден ({@link ErrorCode#COURSE_NOT_FOUND})</li>
+     *                               <li>запись о зачислении не найдена ({@link ErrorCode#ENROLLMENT_NOT_FOUND})</li>
+     *                           </ul>
      */
     @Override
     @Transactional
@@ -330,6 +331,7 @@ public class CourseService implements ICourseService {
         if (currentStatus.equals(EnrollmentStatus.INVITED)) {
             enrollment.setStatus(EnrollmentStatus.ACTIVE);
             enrollment.setEnrolledAt(OffsetDateTime.now(ZoneOffset.UTC));
+            enrollment.setLastViewAt(OffsetDateTime.now(ZoneOffset.UTC));
             enrollmentRepository.save(enrollment);
         }
     }

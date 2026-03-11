@@ -31,8 +31,9 @@ public class CoursesApi {
     @Operation(summary = "Получить список курсов пользователя")
     public ResponseEntity<DashboardResponse> getAllCourses(@AuthenticationPrincipal JwtUserPrincipal principal,
                                                            @RequestParam(name = "page_number", defaultValue = "0") int pageNumber,
-                                                           @RequestParam(name = "page_size", defaultValue = "12") int pageSize) {
-        return ResponseEntity.ok(service.getCoursesDashboard(principal, pageNumber, pageSize));
+                                                           @RequestParam(name = "page_size", defaultValue = "12") int pageSize,
+                                                           @RequestParam(name = "sort", defaultValue = "lastViewDesc") String sortBy) {
+        return ResponseEntity.ok(service.getCoursesDashboard(principal, pageNumber, pageSize, sortBy));
     }
 
     @PostMapping("/{course_id}/invite-links")
@@ -58,8 +59,8 @@ public class CoursesApi {
     @PostMapping("/{courseId}/join")
     @Operation(summary = "Присоединиться к курсу по приглашению")
     public ResponseEntity<Void> joinCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
-                                        @PathVariable UUID courseId,
-                                        @RequestBody JoinCourseRqDto request) {
+                                           @PathVariable UUID courseId,
+                                           @RequestBody JoinCourseRqDto request) {
         service.joinWithInvite(courseId, request, principal);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }

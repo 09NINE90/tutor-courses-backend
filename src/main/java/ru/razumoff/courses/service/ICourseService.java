@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ICourseService {
 
-    DashboardResponse getCoursesDashboard(JwtUserPrincipal principal, int pageNumber, int pageSize);
+    DashboardResponse getCoursesDashboard(JwtUserPrincipal principal, int pageNumber, int pageSize, String sortBy);
 
     void createCourse(JwtUserPrincipal principal, CreateCourseRqDto request, MultipartFile image);
 

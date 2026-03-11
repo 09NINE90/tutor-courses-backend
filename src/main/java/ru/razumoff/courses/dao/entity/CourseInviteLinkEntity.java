@@ -2,7 +2,7 @@ package ru.razumoff.courses.dao.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.razumoff.courses.dao.enumz.CourseStatus;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -41,6 +41,7 @@ public class CourseInviteLinkEntity {
     @Column(name = "expires_at", nullable = false)
     private OffsetDateTime expiresAt;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 

@@ -35,6 +35,7 @@ public class CourseEnrollmentEntity {
     @Column(name = "enrolled_at")
     private OffsetDateTime enrolledAt;
 
+    @CreationTimestamp
     @Column(name = "last_view_at", nullable = false)
     private OffsetDateTime lastViewAt;
 
