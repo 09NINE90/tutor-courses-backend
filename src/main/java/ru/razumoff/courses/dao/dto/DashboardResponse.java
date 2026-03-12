@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -17,8 +16,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Schema(description = "Дашборд курсов")
 public class DashboardResponse {
-
-    Set<String> permissions;
 
     @Schema(
             description = "Общее количество страниц",

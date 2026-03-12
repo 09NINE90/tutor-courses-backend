@@ -64,7 +64,6 @@ public class CourseService implements ICourseService {
             throw new PlatformException(ErrorCode.AUTH_ACCESS_DENIED);
         }
 
-        response.setPermissions(principal.getPermissions());
         return response;
     }
 
@@ -186,7 +185,6 @@ public class CourseService implements ICourseService {
                 .build();
 
         return CoursePageRsDto.builder()
-                .permissions(principal.getPermissions())
                 .status(status)
                 .course(course)
                 .build();
