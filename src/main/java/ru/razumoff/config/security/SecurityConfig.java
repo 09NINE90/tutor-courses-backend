@@ -29,14 +29,14 @@ public class SecurityConfig {
     private String FRONT_ORIGIN;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint((req, res, ex) -> res.setStatus(401))
-                        .accessDeniedHandler((req, res, ex) -> res.setStatus(403))
+                        .authenticationEntryPoint((_, res, _) -> res.setStatus(401))
+                        .accessDeniedHandler((_, res, _) -> res.setStatus(403))
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(

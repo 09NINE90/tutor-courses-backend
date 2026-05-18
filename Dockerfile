@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jdk
 WORKDIR /app
 COPY build/libs/tutor-courses-0.0.1-SNAPSHOT.jar tutor-courses.jar
 EXPOSE 8082
