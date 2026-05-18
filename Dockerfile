@@ -1,6 +1,6 @@
 FROM eclipse-temurin:25-jdk
 WORKDIR /app
-COPY build/libs/tutor-courses-0.0.1-SNAPSHOT.jar tutor-courses.jar
+COPY build/libs/tutor-courses-1.0.0.jar tutor-courses.jar
 EXPOSE 8082
 ENTRYPOINT ["java","-jar","/app/tutor-courses.jar"]
 

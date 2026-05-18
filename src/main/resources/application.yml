@@ -3,8 +3,8 @@ server:
 
 spring:
   application:
-    name: Цифровой портал для репетиторов (сервис для работы с курсами)
-    version: 1.0
+    name: tutor-courses
+    version: 1.0.0
   servlet:
     multipart:
       max-file-size: 5MB
