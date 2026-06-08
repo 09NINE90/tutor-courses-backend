@@ -25,6 +25,7 @@ import ru.razumoff.integretion.users.IUserIntegrationService;
 import ru.razumoff.jwt.JwtUserPrincipal;
 import ru.razumoff.mapper.CourseMapper;
 import ru.razumoff.minio.IMinioFileService;
+import ru.razumoff.utils.DtoUtils;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -219,6 +220,69 @@ public class CourseService implements ICourseService {
             enrollment.setLastViewAt(OffsetDateTime.now(ZoneOffset.UTC));
             enrollmentRepository.save(enrollment);
         }
+    }
+
+    @Override
+    @Transactional
+    public CourseRsDto updateCourse(UUID courseId, CourseUpdateRequest request, JwtUserPrincipal principal) {
+        CourseEntity course = repository.findById(courseId)
+                .orElseThrow(() -> new PlatformException(ErrorCode.COURSE_NOT_FOUND));
+
+        if (!principal.getId().equals(course.getOwnerId())) {
+            throw new RuntimeException();
+        }
+
+        if (!DtoUtils.isDeepEmpty(request, CourseUpdateRequest::getTitle)) {
+            course.setTitle(request.getTitle().trim());
+        }
+
+        if (!DtoUtils.isDeepEmpty(request, CourseUpdateRequest::getDescription)) {
+            course.setDescription(request.getDescription().trim());
+        }
+
+        if (request.getDeleteImage()) {
+            if (course.getImageS3Key() != null) {
+                minioService.deleteImage(course.getImageS3Key());
+                course.setImageS3Key(null);
+            }
+        }
+
+        CourseEntity savedCourse = repository.save(course);
+
+        return CourseRsDto.builder()
+                .id(savedCourse.getId())
+                .title(savedCourse.getTitle())
+                .description(savedCourse.getDescription())
+                .imageUrl(minioService.generatePublicUrl(savedCourse.getImageS3Key()))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public CourseRsDto updateCourseImage(UUID courseId, MultipartFile image, JwtUserPrincipal principal) {
+        CourseEntity course = repository.findById(courseId)
+                .orElseThrow(() -> new PlatformException(ErrorCode.COURSE_NOT_FOUND));
+
+        if (!principal.getId().equals(course.getOwnerId())) {
+            throw new RuntimeException();
+        }
+
+        if (image != null && !image.isEmpty()) {
+            if (course.getImageS3Key() != null) {
+                minioService.deleteImage(course.getImageS3Key());
+            }
+            String s3Key = minioService.uploadCourseImage(image);
+            course.setImageS3Key(s3Key);
+        }
+
+        CourseEntity savedCourse = repository.save(course);
+
+        return CourseRsDto.builder()
+                .id(savedCourse.getId())
+                .title(savedCourse.getTitle())
+                .description(savedCourse.getDescription())
+                .imageUrl(minioService.generatePublicUrl(savedCourse.getImageS3Key()))
+                .build();
     }
 
     /**

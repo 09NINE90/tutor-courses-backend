@@ -39,18 +39,12 @@ public class MinioFileService implements IMinioFileService {
     }
 
     @Override
-    public void deleteImage(String imageUrl) {
+    public void deleteImage(String s3Key) {
         try {
-            URI uri = URI.create(imageUrl);
-            String path = uri.getPath().substring(1);
-            String[] parts = path.split("/", 2);
-            String bucket = parts[0];
-            String object = parts[1];
-
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(object)
+                            .bucket(bucketName)
+                            .object(s3Key)
                             .build()
             );
         } catch (Exception e) {

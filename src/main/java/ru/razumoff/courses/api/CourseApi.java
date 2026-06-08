@@ -1,6 +1,7 @@
 package ru.razumoff.courses.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,9 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.razumoff.courses.dao.dto.CourseMemberRsDto;
-import ru.razumoff.courses.dao.dto.CoursePageRsDto;
-import ru.razumoff.courses.dao.dto.CreateCourseRqDto;
+import ru.razumoff.annotation.LogExecution;
+import ru.razumoff.courses.dao.dto.*;
 import ru.razumoff.courses.dao.dto.internal.InviteUserDto;
 import ru.razumoff.courses.service.ICourseService;
 import ru.razumoff.jwt.JwtUserPrincipal;
@@ -31,6 +31,7 @@ public class CourseApi {
     private final ICourseService service;
 
     @PostMapping("/create")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Создать курс")
     @PreAuthorize("#principal.requirePermission('COURSE_CREATE')")
     public ResponseEntity<Void> createCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
@@ -49,6 +50,7 @@ public class CourseApi {
     }
 
     @GetMapping("/{course_id}")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Получить данные о курсе по ID")
     public ResponseEntity<CoursePageRsDto> getCourseById(@AuthenticationPrincipal JwtUserPrincipal principal,
                                                          @PathVariable("course_id") UUID courseId) {
@@ -56,6 +58,7 @@ public class CourseApi {
     }
 
     @PutMapping("/{course_id}")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Обновить дату просмотра курса")
     public ResponseEntity<Void> viewCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
                                            @PathVariable("course_id") UUID courseId) {
@@ -64,6 +67,7 @@ public class CourseApi {
     }
 
     @GetMapping("/{course_id}/members")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Получить участников курса по ID")
     public ResponseEntity<List<CourseMemberRsDto>> getCourseMembersById(@AuthenticationPrincipal JwtUserPrincipal principal,
                                                                         @PathVariable("course_id") UUID courseId) {
@@ -71,6 +75,7 @@ public class CourseApi {
     }
 
     @PostMapping("/{course_id}/invite")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Пригласить пользователя в курс")
     @PreAuthorize("#principal.requirePermission('COURSE_INVITE_SEND')")
     public ResponseEntity<Void> inviteUserToCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
@@ -86,10 +91,42 @@ public class CourseApi {
     }
 
     @PostMapping("/{course_id}/invite/confirm")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Принять приглашение в курс")
     public ResponseEntity<Void> confirmInvite(@AuthenticationPrincipal JwtUserPrincipal principal,
                                               @PathVariable("course_id") UUID courseId) {
         service.confirmInvite(principal, courseId);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping(value = "/update/{courseId}")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
+    @PreAuthorize("#principal.requirePermission('COURSE_UPDATE_OWN')")
+    @Operation(summary = "Обновить курс", description = "Обновить название, описание курса.")
+    public ResponseEntity<CourseRsDto> updateCourse(
+            @Parameter(description = "Course ID", required = true)
+            @PathVariable UUID courseId,
+            @RequestBody CourseUpdateRequest request,
+            @AuthenticationPrincipal JwtUserPrincipal principal) {
+
+        CourseRsDto updatedCourse = service.updateCourse(courseId, request, principal);
+        return ResponseEntity.ok(updatedCourse);
+    }
+
+    @PatchMapping(value = "/update/{courseId}/image")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
+    @PreAuthorize("#principal.requirePermission('COURSE_UPDATE_OWN')")
+    @Operation(summary = "Обновить курс", description = "Обновить изображение курса.")
+    public ResponseEntity<CourseRsDto> updateCourseImage(
+            @Parameter(description = "Course ID", required = true)
+            @PathVariable UUID courseId,
+
+            @Parameter(description = "Файл изображения курса")
+            @RequestPart(value = "image", required = false)
+            MultipartFile image,
+
+            @AuthenticationPrincipal JwtUserPrincipal principal) {
+        CourseRsDto updatedCourse = service.updateCourseImage(courseId, image, principal);
+        return ResponseEntity.ok(updatedCourse);
     }
 }

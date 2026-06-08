@@ -8,5 +8,5 @@ public interface IMinioFileService {
 
     String generatePublicUrl(String s3Key);
 
-    void deleteImage(String oldAvatarUrl);
+    void deleteImage(String s3Key);
 }

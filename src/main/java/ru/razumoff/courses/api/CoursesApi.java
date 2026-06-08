@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.razumoff.annotation.LogExecution;
 import ru.razumoff.courses.dao.dto.CreateInviteLinkRqDto;
 import ru.razumoff.courses.dao.dto.DashboardResponse;
 import ru.razumoff.courses.dao.dto.InviteLinkRsDto;
@@ -28,6 +29,7 @@ public class CoursesApi {
     private final ICourseService service;
 
     @GetMapping("/dashboard")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Получить список курсов пользователя")
     public ResponseEntity<DashboardResponse> getAllCourses(@AuthenticationPrincipal JwtUserPrincipal principal,
                                                            @RequestParam(name = "page_number", defaultValue = "0") int pageNumber,
@@ -37,6 +39,7 @@ public class CoursesApi {
     }
 
     @PostMapping("/{course_id}/invite-links")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Создать новую ссылку для приглашения в курс")
     public ResponseEntity<InviteLinkRsDto> createInviteLink(@AuthenticationPrincipal JwtUserPrincipal principal,
                                                             @PathVariable("course_id") UUID courseId,
@@ -45,6 +48,7 @@ public class CoursesApi {
     }
 
     @GetMapping("/{course_id}/invite-links")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Получить последнюю валидную ссылку для приглашения в курс")
     public ResponseEntity<InviteLinkRsDto> getInviteLinks(@AuthenticationPrincipal JwtUserPrincipal principal,
                                                           @PathVariable("course_id") UUID courseId) {
@@ -57,6 +61,7 @@ public class CoursesApi {
 
 
     @PostMapping("/{courseId}/join")
+    @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Присоединиться к курсу по приглашению")
     public ResponseEntity<Void> joinCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
                                            @PathVariable UUID courseId,

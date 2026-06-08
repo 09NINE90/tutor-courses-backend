@@ -29,4 +29,8 @@ public interface ICourseService {
     void joinWithInvite(UUID courseId, JoinCourseRqDto request, JwtUserPrincipal principal);
 
     void viewCourse(JwtUserPrincipal principal, UUID courseId);
+
+    CourseRsDto updateCourse(UUID courseId, CourseUpdateRequest request, JwtUserPrincipal principal);
+
+    CourseRsDto updateCourseImage(UUID courseId, MultipartFile image, JwtUserPrincipal principal);
 }
