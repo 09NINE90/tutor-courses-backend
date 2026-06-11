@@ -9,49 +9,35 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.razumoff.annotation.LogExecution;
 import ru.razumoff.courses.dao.dto.CreateInviteLinkRqDto;
-import ru.razumoff.courses.dao.dto.DashboardResponse;
 import ru.razumoff.courses.dao.dto.InviteLinkRsDto;
 import ru.razumoff.courses.dao.dto.JoinCourseRqDto;
-import ru.razumoff.courses.service.ICourseService;
+import ru.razumoff.courses.service.ICourseInviteLinkService;
 import ru.razumoff.jwt.JwtUserPrincipal;
 
 import java.util.UUID;
 
-import static ru.razumoff.Constants.ApiDocs.COURSES_TAG_DESCRIPTION;
-import static ru.razumoff.Constants.ApiDocs.COURSES_TAG_NAME;
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/courses")
-@Tag(name = COURSES_TAG_NAME, description = COURSES_TAG_DESCRIPTION)
-public class CoursesApi {
+@RequestMapping("/api/courses/{courseId}/invite-links")
+@Tag(name = "Course Invite Links", description = "Управление ссылками-приглашениями")
+public class CourseInviteLinkApi {
 
-    private final ICourseService service;
+    private final ICourseInviteLinkService service;
 
-    @GetMapping("/dashboard")
-    @LogExecution(level = LogExecution.LogLevel.INFO)
-    @Operation(summary = "Получить список курсов пользователя")
-    public ResponseEntity<DashboardResponse> getAllCourses(@AuthenticationPrincipal JwtUserPrincipal principal,
-                                                           @RequestParam(name = "page_number", defaultValue = "0") int pageNumber,
-                                                           @RequestParam(name = "page_size", defaultValue = "12") int pageSize,
-                                                           @RequestParam(name = "sort", defaultValue = "lastViewDesc") String sortBy) {
-        return ResponseEntity.ok(service.getCoursesDashboard(principal, pageNumber, pageSize, sortBy));
-    }
-
-    @PostMapping("/{course_id}/invite-links")
+    @PostMapping
     @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Создать новую ссылку для приглашения в курс")
     public ResponseEntity<InviteLinkRsDto> createInviteLink(@AuthenticationPrincipal JwtUserPrincipal principal,
-                                                            @PathVariable("course_id") UUID courseId,
+                                                            @PathVariable UUID courseId,
                                                             @RequestBody CreateInviteLinkRqDto request) {
         return ResponseEntity.ok(service.createInviteLink(principal, request, courseId));
     }
 
-    @GetMapping("/{course_id}/invite-links")
+    @GetMapping("/active")
     @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Получить последнюю валидную ссылку для приглашения в курс")
     public ResponseEntity<InviteLinkRsDto> getInviteLinks(@AuthenticationPrincipal JwtUserPrincipal principal,
-                                                          @PathVariable("course_id") UUID courseId) {
+                                                          @PathVariable UUID courseId) {
         InviteLinkRsDto result = service.getInviteLinks(principal, courseId);
         if (result == null) {
             return ResponseEntity.noContent().build();
@@ -60,7 +46,7 @@ public class CoursesApi {
     }
 
 
-    @PostMapping("/{courseId}/join")
+    @PostMapping("/join")
     @LogExecution(level = LogExecution.LogLevel.INFO)
     @Operation(summary = "Присоединиться к курсу по приглашению")
     public ResponseEntity<Void> joinCourse(@AuthenticationPrincipal JwtUserPrincipal principal,
@@ -69,5 +55,4 @@ public class CoursesApi {
         service.joinWithInvite(courseId, request, principal);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
-
 }

@@ -200,7 +200,7 @@ tutor-courses-backend/
 
 ```
 Владелец курса → POST /api/course/{id}/invite (userId)
-    → CourseService.inviteUserToCourse()
+    → CourseService.inviteUser()
     → Создание CourseEnrollment со статусом INVITED
     → Отправка уведомления (через внешний сервис, если подключён)
 
